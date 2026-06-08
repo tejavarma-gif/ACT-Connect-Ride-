@@ -1,0 +1,120 @@
+.page { padding: 28px 32px; min-height: 100%; }
+
+/* view toggle */
+.view-toggle { display: flex; background: var(--bg4); border-radius: 10px; padding: 4px; }
+.view-toggle button { padding: 9px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; background: none; color: var(--muted); transition: all 0.2s; display: flex; align-items: center; gap: 7px; }
+.view-toggle button.active { background: var(--card); color: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,0.4); }
+.pending-badge { background: var(--accent); color: #fff; font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 20px; }
+.count-badge { background: var(--accent2); color: #00252a; font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 20px; }
+
+/* finished / cancelled items are greyed so attention stays on active ones */
+.dimmed { opacity: 0.5; filter: grayscale(0.85); }
+.dimmed:hover { transform: none; border-color: var(--border); }
+
+.await-hint { font-size: 12px; color: var(--muted2); display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border: 1px dashed var(--border2); border-radius: 8px; }
+
+.section-block { margin-bottom: 12px; }
+.block-head { font-size: 15px; font-weight: 700; color: var(--muted); display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+.block-head i { color: var(--accent-light); }
+
+.rides-list { display: flex; flex-direction: column; gap: 14px; }
+.my-ride-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; display: flex; align-items: center; gap: 20px; transition: all 0.2s; }
+.my-ride-card:hover { border-color: var(--border2); transform: translateX(4px); }
+.mrc-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+.mrc-icon.car { background: rgba(163, 163, 204,0.12); }
+.mrc-icon.bike { background: rgba(92, 92, 153,0.12); }
+.mrc-content { flex: 1; min-width: 0; }
+.mrc-top { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; flex-wrap: wrap; }
+.mrc-route { font-size: 16px; font-weight: 700; }
+.mrc-meta { font-size: 13px; color: var(--muted); display: flex; gap: 16px; flex-wrap: wrap; }
+.mrc-meta span { display: flex; align-items: center; gap: 5px; }
+.mrc-right { text-align: right; flex-shrink: 0; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+.mrc-action { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+
+/* status badges */
+.mrc-status { padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+.mrc-status.pending { background: rgba(224, 166, 60,0.12); color: var(--accent4); }
+.mrc-status.accepted { background: rgba(163, 163, 204,0.12); color: var(--accent2); }
+.mrc-status.active { background: rgba(163, 163, 204,0.12); color: var(--accent2); }
+.mrc-status.completed { background: rgba(16, 185, 129,0.12); color: #10B981; }
+.mrc-status.cancelled, .mrc-status.rejected { background: rgba(209, 77, 107,0.12); color: var(--accent3); }
+
+.status-hint { font-size: 12px; margin-top: 8px; display: flex; align-items: center; gap: 6px; }
+.status-hint.pending { color: var(--accent4); }
+.status-hint.ok { color: #10B981; }
+.status-hint.bad { color: var(--accent3); }
+
+.action-btn-sm { padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; border: 1px solid var(--border2); background: transparent; color: var(--muted); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+.action-btn-sm:hover { color: var(--text); border-color: var(--text); }
+.action-btn-sm.rate { background: rgba(224, 166, 60,0.12); color: var(--accent4); border-color: rgba(224, 166, 60,0.25); }
+.action-btn-sm.rate:hover { background: rgba(224, 166, 60,0.18); }
+.action-btn-sm.accept { background: #10B981; color: #ffffff; border-color: #10B981; }
+.action-btn-sm.accept:hover { filter: brightness(1.05); }
+.action-btn-sm.complete { background: #10B981; color: #ffffff; border-color: #10B981; }
+.action-btn-sm.complete:hover { filter: brightness(1.05); }
+.action-btn-sm.chat { background: #5C5C99; color: #ffffff; border-color: #5C5C99; }
+.action-btn-sm.chat:hover { filter: brightness(1.05); }
+.action-btn-sm.danger { color: var(--accent3); border-color: rgba(209, 77, 107,0.3); }
+.action-btn-sm.danger:hover { background: rgba(209, 77, 107,0.1); }
+.rated-tag { font-size: 12px; font-weight: 600; color: #10B981; display: inline-flex; align-items: center; gap: 5px; }
+
+/* driver ride cards */
+.driver-ride { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 14px; }
+.dr-head { display: flex; align-items: center; gap: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+.dr-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+.dr-icon.car { background: rgba(163, 163, 204,0.12); }
+.dr-icon.bike { background: rgba(92, 92, 153,0.12); }
+.dr-info { flex: 1; }
+.dr-route { font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 10px; margin-bottom: 5px; flex-wrap: wrap; }
+.dr-head-actions { display: flex; gap: 8px; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end; }
+.dr-requests { padding-top: 14px; }
+.dr-req-label { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.dr-req-label .count { background: var(--bg4); color: var(--text); padding: 1px 8px; border-radius: 20px; font-size: 11px; }
+.no-req { font-size: 13px; color: var(--muted2); padding: 8px 0; }
+
+.req-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px; background: var(--bg3); border-radius: var(--radius-sm); margin-bottom: 8px; flex-wrap: wrap; }
+.req-passenger { display: flex; align-items: center; gap: 12px; }
+.req-avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: #fff; flex-shrink: 0; }
+.req-name { font-size: 14px; font-weight: 600; }
+.req-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.req-contact { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+.req-action { display: flex; gap: 8px; align-items: center; }
+.req-status { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+.req-status.accepted { background: rgba(16, 185, 129,0.12); color: #10B981; }
+.req-status.rejected { background: rgba(209, 77, 107,0.12); color: var(--accent3); }
+.req-status.cancelled { background: rgba(209, 77, 107,0.12); color: var(--accent3); }
+.req-status.completed { background: rgba(16, 185, 129,0.12); color: #10B981; }
+.req-status.pending { background: rgba(224, 166, 60,0.12); color: var(--accent4); }
+
+/* phone + chat chips */
+.phone-chip { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: #ffffff; background: #5C5C99; border: 1px solid #5C5C99; padding: 5px 11px; border-radius: 20px; text-decoration: none; }
+.phone-chip:hover { filter: brightness(1.05); }
+.phone-chip.sm { font-size: 12px; padding: 3px 9px; }
+.phone-chip.chat { color: #ffffff; background: #5C5C99; border-color: #5C5C99; }
+
+/* dark mode phone + chat chips */
+body.dark .phone-chip { color: #ffffff; background: #8C8CE0; border-color: #8C8CE0; }
+body.dark .phone-chip.chat { color: #ffffff; background: #8C8CE0; border-color: #8C8CE0; }
+
+/* rating modal */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.rate-modal { background: var(--card); border: 1px solid var(--border2); border-radius: var(--radius-lg); padding: 28px; width: 100%; max-width: 420px; text-align: center; position: relative; animation: modalIn 0.25s ease; }
+@keyframes modalIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+.modal-close { position: absolute; top: 16px; right: 16px; width: 30px; height: 30px; border-radius: 50%; background: var(--bg3); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--muted); }
+.rate-title { font-size: 20px; font-weight: 800; margin-bottom: 4px; }
+.rate-sub { font-size: 13px; color: var(--muted); margin-bottom: 22px; }
+.stars { display: flex; justify-content: center; gap: 10px; margin-bottom: 18px; }
+.stars i { font-size: 30px; color: var(--bg4); cursor: pointer; transition: all 0.15s; }
+.stars i.filled { color: var(--accent4); transform: scale(1.05); }
+.review-box { resize: vertical; text-align: left; margin-bottom: 18px; font-family: 'DM Sans', sans-serif; }
+.confirm-book-btn { width: 100%; padding: 14px; border-radius: var(--radius-sm); background: var(--grad); border: none; font-size: 15px; font-weight: 800; color: #fff; cursor: pointer; font-family: 'Saira', sans-serif; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.confirm-book-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(92, 92, 153,0.3); }
+
+@media (max-width: 600px) {
+  .page { padding: 20px 16px; }
+  .my-ride-card { flex-direction: column; align-items: flex-start; }
+  .mrc-right { text-align: left; width: 100%; align-items: flex-start; }
+  .mrc-action { justify-content: flex-start; }
+  .req-row { flex-direction: column; align-items: flex-start; }
+  .dr-head { flex-wrap: wrap; }
+}

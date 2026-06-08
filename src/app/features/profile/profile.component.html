@@ -1,0 +1,178 @@
+<div class="page fade-in">
+  <div class="section-header" style="margin-bottom: 24px">
+    <div>
+      <div class="section-title">My Profile</div>
+      <div class="section-sub">Manage your account and preferences</div>
+    </div>
+  </div>
+
+  @if (user; as u) {
+    <div class="profile-layout">
+      <!-- LEFT -->
+      <div>
+        <div class="profile-card">
+          <div class="profile-av" [style.background]="u.avatarColor">
+            {{ u.initials }}<div class="profile-av-badge">✓</div>
+          </div>
+
+          @if (editing()) {
+            <div class="edit-form">
+              <input class="form-input" [(ngModel)]="name" placeholder="Name" />
+              <input class="form-input" [(ngModel)]="city" placeholder="City" />
+              <input class="form-input" [(ngModel)]="phone" placeholder="Phone number" />
+              <textarea class="form-input" [(ngModel)]="bio" rows="3" placeholder="Bio"></textarea>
+              <div class="edit-actions">
+                <button class="edit-profile-btn save" (click)="saveProfile()">Save</button>
+                <button class="edit-profile-btn" (click)="editing.set(false)">Cancel</button>
+              </div>
+            </div>
+          } @else {
+            <div class="profile-name">{{ u.name }}</div>
+            <div class="profile-handle">{{ u.handle }} · {{ u.city }}</div>
+            @if (u.phone) {
+              <div class="profile-phone"><i class="fa-solid fa-phone"></i> {{ u.phone }}</div>
+            }
+            <div class="profile-level"><i class="fa-solid fa-medal"></i> {{ u.level }}</div>
+            <div class="profile-bio">{{ u.bio }}</div>
+            <div class="profile-stats">
+              <div class="ps-item g">
+                <div class="ps-val">{{ u.ridesCount }}</div>
+                <div class="ps-lbl">Rides</div>
+              </div>
+              <div class="ps-item b">
+                <div class="ps-val">{{ u.rating }}</div>
+                <div class="ps-lbl">Rating</div>
+              </div>
+              <div class="ps-item p">
+                <div class="ps-val">{{ u.reviewsCount }}</div>
+                <div class="ps-lbl">Reviews</div>
+              </div>
+            </div>
+            <button class="edit-profile-btn" (click)="startEdit()">Edit Profile</button>
+          }
+        </div>
+
+        <!-- VEHICLE -->
+        <div class="form-card" style="margin-top: 16px">
+          <div class="card-h"><i class="fa-solid fa-car" style="color: var(--accent2)"></i> My Vehicle</div>
+          @if (editingVehicle()) {
+            <div class="edit-form">
+              <input class="form-input" [(ngModel)]="vModel" placeholder="Model e.g. Honda City (2022)" />
+              <input class="form-input" [(ngModel)]="vNumber" placeholder="Number e.g. KA-01-MX-4729" />
+              <input class="form-input" [(ngModel)]="vColor" placeholder="Color e.g. Pearl White" />
+              <div class="edit-actions">
+                <button class="edit-profile-btn save" (click)="saveVehicle()">Save</button>
+                <button class="edit-profile-btn" (click)="editingVehicle.set(false)">Cancel</button>
+              </div>
+            </div>
+          } @else {
+            <div class="vehicle-box">
+              <div style="font-size: 36px">{{ u.vehicle.type === 'bike' ? '🏍️' : '🚗' }}</div>
+              <div>
+                <div style="font-size: 15px; font-weight: 600">{{ u.vehicle.model || 'No vehicle added' }}</div>
+                <div style="font-size: 13px; color: var(--muted); margin-top: 2px">
+                  {{ u.vehicle.number }}<span *ngIf="u.vehicle.color"> · {{ u.vehicle.color }}</span>
+                </div>
+                @if (u.vehicle.verified) {
+                  <div style="font-size: 12px; color: var(--accent-light); margin-top: 4px; font-weight: 600">✓ Verified</div>
+                }
+              </div>
+              <div style="margin-left: auto">
+                <button class="action-btn" (click)="startVehicleEdit()">Edit</button>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- RIGHT -->
+      <div class="profile-right">
+        <!-- ACHIEVEMENTS -->
+        <div class="pref-section">
+          <div class="pref-title"><i class="fa-solid fa-trophy"></i> Achievements</div>
+          <div class="badge-row">
+            @for (b of u.badges; track b) {
+              <div class="badge-item">
+                <div class="badge-icon">{{ badgeIcon(b) }}</div>
+                <div class="badge-info">
+                  <div class="badge-name">{{ b }}</div>
+                  <div class="badge-desc">{{ badgeDesc(b) }}</div>
+                </div>
+              </div>
+            } @empty {
+              <div class="badge-desc" style="color: var(--muted)">No badges yet — start riding!</div>
+            }
+          </div>
+        </div>
+
+        <!-- PREFERENCES -->
+        <div class="pref-section">
+          <div class="pref-title"><i class="fa-solid fa-sliders"></i> Preferences</div>
+          <div class="pref-list">
+            <div class="pref-item" (click)="editMusic()">
+              <div class="pref-item-left"><div class="pref-icon"><i class="fa-solid fa-music"></i></div><span class="pref-label">Music Preference</span></div>
+              <div class="pref-right"><span class="pref-value">{{ u.preferences.music }}</span><i class="chevron fa-solid fa-chevron-right"></i></div>
+            </div>
+            <div class="pref-item" (click)="toggleNotifications()">
+              <div class="pref-item-left"><div class="pref-icon"><i class="fa-regular fa-bell"></i></div><span class="pref-label">Notifications</span></div>
+              <div class="pref-right"><span class="pref-value">{{ u.preferences.notifications }}</span><i class="chevron fa-solid fa-chevron-right"></i></div>
+            </div>
+            <div class="pref-item" (click)="cycleLanguage()">
+              <div class="pref-item-left"><div class="pref-icon"><i class="fa-solid fa-language"></i></div><span class="pref-label">Language</span></div>
+              <div class="pref-right"><span class="pref-value">{{ u.preferences.language }}</span><i class="chevron fa-solid fa-chevron-right"></i></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SAFETY -->
+        <div class="pref-section">
+          <div class="pref-title"><i class="fa-solid fa-shield-halved"></i> Safety &amp; Security</div>
+          <div class="pref-list">
+            <div class="pref-item" (click)="editEmergency()">
+              <div class="pref-item-left"><div class="pref-icon"><i class="fa-solid fa-phone"></i></div><span class="pref-label">Emergency Contact</span></div>
+              <div class="pref-right"><span class="pref-value">{{ u.preferences.emergencyContact || 'Not set' }}</span><i class="chevron fa-solid fa-chevron-right"></i></div>
+            </div>
+            <div class="pref-item" (click)="updatePref('shareTripLive', !u.preferences.shareTripLive, 'Share trip setting updated!')">
+              <div class="pref-item-left"><div class="pref-icon"><i class="fa-solid fa-share-nodes"></i></div><span class="pref-label">Share Trip Live</span></div>
+              <div class="pref-right"><span class="pref-value" [style.color]="u.preferences.shareTripLive ? 'var(--accent-light)' : 'var(--muted)'">{{ u.preferences.shareTripLive ? 'Enabled' : 'Off' }}</span><i class="chevron fa-solid fa-chevron-right"></i></div>
+            </div>
+            <div class="pref-item" (click)="updatePref('twoFactorAuth', !u.preferences.twoFactorAuth, '2FA setting updated!')">
+              <div class="pref-item-left"><div class="pref-icon"><i class="fa-solid fa-lock"></i></div><span class="pref-label">Two-Factor Auth</span></div>
+              <div class="pref-right"><span class="pref-value" [style.color]="u.preferences.twoFactorAuth ? 'var(--accent-light)' : 'var(--muted)'">{{ u.preferences.twoFactorAuth ? 'On' : 'Off' }}</span><i class="chevron fa-solid fa-chevron-right"></i></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- REVIEWS -->
+        <div class="pref-section">
+          <div class="pref-title"><i class="fa-solid fa-comment-dots"></i> Reviews About You</div>
+          @if (reviews().length === 0) {
+            <div class="no-reviews">No reviews yet. Complete a ride and your passengers can rate you.</div>
+          } @else {
+            <div class="review-list">
+              @for (rv of reviews(); track rv._id) {
+                <div class="review-item">
+                  <div class="review-head">
+                    <div class="review-av" [style.background]="rv.passengerColor">{{ rv.passengerInitials }}</div>
+                    <div class="review-meta">
+                      <div class="review-name">{{ rv.passengerName }}</div>
+                      <div class="review-route">{{ rv.route }} · {{ rv.date | date: 'mediumDate' }}</div>
+                    </div>
+                    <div class="review-stars">
+                      @for (s of stars(rv.rating); track $index) {
+                        <i class="fa-solid fa-star"></i>
+                      }
+                    </div>
+                  </div>
+                  @if (rv.text) {
+                    <div class="review-text">“{{ rv.text }}”</div>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,207 @@
+<div class="page fade-in">
+  <div class="section-header" style="margin-bottom: 24px">
+    <div>
+      <div class="section-title">My Rides</div>
+      <div class="section-sub">Manage rides you've requested and rides you offer</div>
+    </div>
+    <div class="view-toggle">
+      <button [class.active]="view() === 'passenger'" (click)="setView('passenger')">
+        🎒 As Passenger
+        @if (passengerActiveCount() > 0) {
+          <span class="count-badge">{{ passengerActiveCount() }}</span>
+        }
+      </button>
+      <button [class.active]="view() === 'driver'" (click)="setView('driver')">
+        🚗 As Driver
+        @if (driverActiveCount() > 0) {
+          <span class="count-badge">{{ driverActiveCount() }}</span>
+        }
+        @if (pendingCount() > 0) {
+          <span class="pending-badge" title="pending requests">{{ pendingCount() }}</span>
+        }
+      </button>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="spinner"></div>
+  }
+
+  <!-- ════════ PASSENGER VIEW ════════ -->
+  @if (view() === 'passenger') {
+    <div class="section-block">
+      <div class="block-head"><i class="fa-solid fa-person"></i> Rides You Requested</div>
+
+      @if (passengerRides().length === 0) {
+        <div class="empty-state">
+          <div class="empty-icon">🎒</div>
+          <div class="empty-title">No bookings yet</div>
+          <div class="empty-sub">Find a ride and send a request to a driver to get started!</div>
+        </div>
+      } @else {
+        <div class="rides-list">
+          @for (r of passengerRides(); track r._id) {
+            <div class="my-ride-card fade-in" [class.dimmed]="isPassengerDimmed(r)">
+              <div class="mrc-icon {{ r.type }}">{{ r.type === 'car' ? '🚗' : '🏍️' }}</div>
+              <div class="mrc-content">
+                <div class="mrc-top">
+                  <div class="mrc-route">{{ r.from }} → {{ r.to }}</div>
+                  <span class="mrc-status {{ r.status }}">{{ cap(r.status) }}</span>
+                </div>
+                <div class="mrc-meta">
+                  <span><i class="fa-regular fa-calendar"></i> {{ r.date }}</span>
+                  <span><i class="fa-regular fa-clock"></i> {{ r.time }}</span>
+                  <span><i class="fa-solid fa-user"></i> {{ r.driver }}</span>
+                </div>
+                @if (r.status === 'pending') {
+                  <div class="status-hint pending"><i class="fa-solid fa-hourglass-half"></i> Waiting for the driver to accept your request</div>
+                }
+                @if (r.status === 'accepted') {
+                  <div class="status-hint ok"><i class="fa-solid fa-circle-check"></i> Confirmed! The driver accepted your request</div>
+                }
+                @if (r.status === 'rejected') {
+                  <div class="status-hint bad"><i class="fa-solid fa-circle-xmark"></i> The driver declined this request</div>
+                }
+                @if (r.status === 'completed' && !r.rated) {
+                  <div class="status-hint ok"><i class="fa-solid fa-flag-checkered"></i> Ride completed — please rate your driver</div>
+                }
+              </div>
+              <div class="mrc-right">
+                @if (r.driverPhone) {
+                  <a class="phone-chip" [href]="telLink(r.driverPhone)"><i class="fa-solid fa-phone"></i> {{ r.driverPhone }}</a>
+                }
+                <div class="mrc-action">
+                  @if (r.driverPhone && (r.status === 'accepted' || r.status === 'active')) {
+                    <a class="action-btn-sm chat" [href]="smsLink(r.driverPhone)"><i class="fa-solid fa-comment-dots"></i> Chat</a>
+                  }
+                  @if (r.status === 'completed' && !r.rated) {
+                    <button class="action-btn-sm rate" (click)="openRate(r)"><i class="fa-regular fa-star"></i> Rate</button>
+                  }
+                  @if (r.status === 'completed' && r.rated) {
+                    <span class="rated-tag"><i class="fa-solid fa-check"></i> Rated</span>
+                  }
+                  @if (r.status === 'pending' || r.status === 'accepted') {
+                    <button class="action-btn-sm danger" (click)="cancelBooking(r)"><i class="fa-solid fa-xmark"></i> Cancel</button>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <!-- ════════ DRIVER VIEW ════════ -->
+  @if (view() === 'driver') {
+    <div class="section-block">
+      <div class="block-head"><i class="fa-solid fa-car-side"></i> Rides You Offer &amp; Incoming Requests</div>
+
+      @if (driverRides().length === 0) {
+        <div class="empty-state">
+          <div class="empty-icon">🚗</div>
+          <div class="empty-title">You haven't offered any rides</div>
+          <div class="empty-sub">Publish a ride from the “Offer a Ride” page to start receiving requests.</div>
+        </div>
+      } @else {
+        @for (ride of driverRides(); track ride._id) {
+          <div class="driver-ride fade-in" [class.dimmed]="isDimmed(ride.status)">
+            <div class="dr-head">
+              <div class="dr-icon {{ ride.type }}">{{ ride.type === 'car' ? '🚗' : '🏍️' }}</div>
+              <div class="dr-info">
+                <div class="dr-route">{{ ride.from }} → {{ ride.to }}
+                  <span class="mrc-status {{ ride.status }}">{{ cap(ride.status) }}</span>
+                </div>
+                <div class="mrc-meta">
+                  <span><i class="fa-regular fa-calendar"></i> {{ ride.date }}</span>
+                  <span><i class="fa-regular fa-clock"></i> {{ ride.time }}</span>
+                  <span><i class="fa-solid fa-chair"></i> {{ ride.seatsAvailable }}/{{ ride.totalSeats }} seats free</span>
+                </div>
+              </div>
+              <div class="dr-head-actions">
+                @if (ride.status === 'active') {
+                  @if (canComplete(ride)) {
+                    <button class="action-btn-sm complete" (click)="completeRide(ride._id)">
+                      <i class="fa-solid fa-flag-checkered"></i> Complete
+                    </button>
+                  } @else {
+                    <span class="await-hint" title="Accept a request to enable Complete">
+                      <i class="fa-regular fa-clock"></i> Awaiting riders
+                    </span>
+                  }
+                  <button class="action-btn-sm danger" (click)="deleteRide(ride._id)">
+                    <i class="fa-solid fa-trash"></i> Cancel
+                  </button>
+                }
+                @if (ride.status === 'completed') {
+                  <span class="req-status completed">Completed</span>
+                }
+              </div>
+            </div>
+
+            <div class="dr-requests">
+              <div class="dr-req-label">
+                Requests
+                <span class="count">{{ ride.requests.length }}</span>
+              </div>
+
+              @if (ride.requests.length === 0) {
+                <div class="no-req">No requests yet for this ride.</div>
+              } @else {
+                @for (q of ride.requests; track q._id) {
+                  <div class="req-row">
+                    <div class="req-passenger">
+                      <div class="req-avatar" [style.background]="q.passengerColor">{{ q.passengerInitials }}</div>
+                      <div>
+                        <div class="req-name">{{ q.passengerName }}</div>
+                        <div class="req-sub">
+                          <i class="fa-solid fa-star" style="color: var(--accent4)"></i> {{ q.passengerRating }}
+                          · {{ q.seats }} seat(s)
+                        </div>
+                        @if (q.passengerPhone) {
+                          <div class="req-contact">
+                            <a class="phone-chip sm" [href]="telLink(q.passengerPhone)"><i class="fa-solid fa-phone"></i> {{ q.passengerPhone }}</a>
+                            <a class="phone-chip sm chat" [href]="smsLink(q.passengerPhone)"><i class="fa-solid fa-comment-dots"></i> Chat</a>
+                          </div>
+                        }
+                      </div>
+                    </div>
+                    <div class="req-action">
+                      @if (q.status === 'pending') {
+                        <button class="action-btn-sm accept" (click)="accept(q._id)"><i class="fa-solid fa-check"></i> Accept</button>
+                        <button class="action-btn-sm danger" (click)="reject(q._id)"><i class="fa-solid fa-xmark"></i> Reject</button>
+                      } @else {
+                        <span class="req-status {{ q.status }}">{{ cap(q.status) }}</span>
+                      }
+                    </div>
+                  </div>
+                }
+              }
+            </div>
+          </div>
+        }
+      }
+    </div>
+  }
+</div>
+
+<!-- RATING + REVIEW MODAL -->
+@if (rateTarget(); as r) {
+  <div class="modal-overlay" (click)="closeRate()">
+    <div class="rate-modal" (click)="$event.stopPropagation()">
+      <div class="modal-close" (click)="closeRate()"><i class="fa-solid fa-xmark"></i></div>
+      <div class="rate-title">Rate your ride</div>
+      <div class="rate-sub">{{ r.from }} → {{ r.to }} · {{ r.driver }}</div>
+      <div class="stars">
+        @for (s of [1,2,3,4,5]; track s) {
+          <i class="fa-solid fa-star" [class.filled]="s <= rateValue()" (click)="setStars(s)"></i>
+        }
+      </div>
+      <textarea class="form-input review-box" rows="3" [(ngModel)]="reviewText"
+        placeholder="Share your experience (optional)…"></textarea>
+      <button class="confirm-book-btn" (click)="submitRate()">
+        <i class="fa-solid fa-paper-plane"></i> Submit Review
+      </button>
+    </div>
+  </div>
+}

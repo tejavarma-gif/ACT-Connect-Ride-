@@ -1,0 +1,214 @@
+<div class="page fade-in">
+  <!-- HERO SEARCH -->
+  <div class="hero">
+    <div class="hero-tag"><div class="dot"></div> {{ stats()?.totalAvailable || 0 }} rides available near you</div>
+    <h1>Find your perfect<br /><span>pooling partner</span></h1>
+    <p>Share rides, reduce carbon. Connect with fellow ACT commuters on your route.</p>
+
+    <div class="search-form">
+      <div class="ride-toggle">
+        <button class="ride-toggle-btn car" [class.active]="vehicleFilter() === 'car'" (click)="setVehicle('car')">
+          <i class="fa-solid fa-car"></i> Car Pool
+        </button>
+        <button class="ride-toggle-btn bike" [class.active]="vehicleFilter() === 'bike'" (click)="setVehicle('bike')">
+          <i class="fa-solid fa-motorcycle"></i> Bike Pool
+        </button>
+        <button class="ride-toggle-btn" [class.active]="vehicleFilter() === 'all'" (click)="setVehicle('all')">
+          <i class="fa-solid fa-layer-group"></i> All
+        </button>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>From</label>
+          <div class="input-icon-wrap">
+            <i class="fi fa-solid fa-circle-dot" style="color: var(--accent)"></i>
+            <input class="form-input" [(ngModel)]="from" placeholder="Starting point" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>To</label>
+          <div class="input-icon-wrap">
+            <i class="fi fa-solid fa-location-dot" style="color: var(--accent3)"></i>
+            <input class="form-input" [(ngModel)]="to" placeholder="Destination" />
+          </div>
+        </div>
+      </div>
+      <div class="form-row-3">
+        <div class="form-group">
+          <label>Date</label>
+          <div class="input-icon-wrap">
+            <i class="fi fa-regular fa-calendar"></i>
+            <input class="form-input" type="date" [(ngModel)]="date" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Time</label>
+          <div class="input-icon-wrap">
+            <i class="fi fa-regular fa-clock"></i>
+            <input class="form-input" type="time" [(ngModel)]="time" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Passengers</label>
+          <div class="input-icon-wrap">
+            <i class="fi fa-solid fa-user-group"></i>
+            <select class="form-input" [(ngModel)]="passengers">
+              <option [ngValue]="1">1 passenger</option>
+              <option [ngValue]="2">2 passengers</option>
+              <option [ngValue]="3">3 passengers</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <button class="search-btn" (click)="doSearch()">
+        <i class="fa-solid fa-magnifying-glass"></i> Search Rides
+      </button>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card s1">
+      <div class="stat-icon"><i class="fa-solid fa-car"></i></div>
+      <div class="stat-val">{{ stats()?.carsAvailable || 0 }}</div>
+      <div class="stat-lbl">Cars Available</div>
+    </div>
+    <div class="stat-card s2">
+      <div class="stat-icon"><i class="fa-solid fa-motorcycle"></i></div>
+      <div class="stat-val">{{ stats()?.bikesAvailable || 0 }}</div>
+      <div class="stat-lbl">Bikes Available</div>
+    </div>
+    <div class="stat-card s3">
+      <div class="stat-icon"><i class="fa-solid fa-route"></i></div>
+      <div class="stat-val">{{ stats()?.totalAvailable || 0 }}</div>
+      <div class="stat-lbl">Total Rides</div>
+    </div>
+    <div class="stat-card s4">
+      <div class="stat-icon"><i class="fa-solid fa-chair"></i></div>
+      <div class="stat-val">{{ stats()?.seatsOpen || 0 }}</div>
+      <div class="stat-lbl">Seats Open Now</div>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="section-header">
+    <div>
+      <div class="section-title">Available Rides</div>
+      <div class="section-sub">Showing {{ rides().length }} ride(s) · {{ from || 'All routes' }}{{ to ? ' → ' + to : '' }}</div>
+    </div>
+    <div class="filter-chips">
+      <div class="chip" [class.active]="activeChip() === 'all'" (click)="filter('all')">All</div>
+      <div class="chip" [class.active]="activeChip() === 'car'" (click)="filter('car')">🚗 Car</div>
+      <div class="chip" [class.active]="activeChip() === 'bike'" (click)="filter('bike')">🏍️ Bike</div>
+      <div class="chip" [class.active]="activeChip() === 'fast'" (click)="filter('fast')">⚡ Earliest</div>
+      <div class="chip" [class.active]="activeChip() === 'rated'" (click)="filter('rated')">⭐ Top Rated</div>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="spinner"></div>
+  } @else if (rides().length === 0) {
+    <div class="empty-state">
+      <div class="empty-icon">🔍</div>
+      <div class="empty-title">No rides found</div>
+      <div class="empty-sub">No one has published a ride on this route yet. Try “All”, or check back soon.</div>
+    </div>
+  } @else {
+    <div class="rides-grid">
+      @for (r of rides(); track r._id) {
+        <div class="ride-card fade-in" (click)="openModal(r)">
+          <div class="rc-header">
+            <div class="rc-driver">
+              <div class="rc-avatar" [style.background]="r.driver.avatarColor">{{ r.driver.initials }}</div>
+              <div>
+                <div class="rc-name">{{ r.driver.name }}</div>
+                <div class="rc-rating">
+                  <i class="fa-solid fa-star"></i> {{ r.driver.rating }}
+                  <span style="color: var(--muted2)">({{ r.driver.reviewsCount }})</span>
+                </div>
+              </div>
+            </div>
+            <span class="rc-badge {{ r.badge }}">{{ badgeLabel(r.badge) }}</span>
+          </div>
+          <div class="rc-amenities">
+            @for (a of r.amenities; track a) {
+              <div class="amenity"><i class="fa-solid fa-check" style="color: var(--accent-light)"></i>{{ a }}</div>
+            }
+          </div>
+          <div class="rc-route">
+            <div class="rc-route-line">
+              <div class="route-dot from"></div>
+              <div class="route-dashes"></div>
+              <div class="route-dot to"></div>
+            </div>
+            <div class="rc-route-info">
+              <div class="rc-place">{{ r.from }}</div>
+              <div class="rc-time">{{ r.depTime }}</div>
+              <div class="rc-spacer"></div>
+              <div class="rc-place">{{ r.to }}</div>
+              <div class="rc-time">{{ r.arrTime }}</div>
+            </div>
+          </div>
+          <div class="rc-footer">
+            <div class="rc-seats"><i class="fa-solid fa-user-group"></i> {{ r.seatsAvailable }} of {{ r.totalSeats }} seats left</div>
+            <button class="book-btn" (click)="$event.stopPropagation(); openModal(r)">Request</button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+<!-- REQUEST MODAL -->
+@if (modalRide(); as r) {
+  <div class="modal-overlay show" (click)="closeModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-close" (click)="closeModal()"><i class="fa-solid fa-xmark"></i></div>
+      <div class="modal-title">Request {{ r.type === 'bike' ? 'Bike' : 'Car' }} Pool</div>
+      <div class="modal-sub">{{ r.from }} → {{ r.to }} · {{ r.depTime }}</div>
+
+      <div class="driver-info">
+        <div class="di-avatar" [style.background]="r.driver.avatarColor">{{ r.driver.initials }}</div>
+        <div>
+          <div class="di-name">{{ r.driver.name }}</div>
+          <div class="di-meta">⭐ {{ r.driver.rating }} · {{ r.driver.reviewsCount }} reviews</div>
+        </div>
+      </div>
+
+      <div class="route-visual">
+        <div class="rv-point" style="border-right: 1px solid var(--border)">
+          <div class="rv-label" style="color: var(--accent-light)">FROM</div>
+          <div class="rv-place">{{ r.from }}</div>
+          <div class="rv-time">{{ r.depTime }}</div>
+        </div>
+        <div class="rv-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+        <div class="rv-point">
+          <div class="rv-label" style="color: var(--accent3)">TO</div>
+          <div class="rv-place">{{ r.to }}</div>
+          <div class="rv-time">{{ r.arrTime }}</div>
+        </div>
+      </div>
+
+      <div class="amenity-row">
+        @for (a of r.amenities; track a) {
+          <span class="amenity"><i class="fa-solid fa-check" style="color: var(--accent-light)"></i>{{ a }}</span>
+        }
+      </div>
+
+      <div class="info-note">
+        <i class="fa-solid fa-circle-info"></i>
+        Your seat is held as <strong>pending</strong> until {{ (r.driver.name || 'the driver').split(' ')[0] }} accepts.
+        Once accepted, you'll both see each other's phone number to coordinate.
+      </div>
+
+      <button class="confirm-book-btn" (click)="confirmBook()" [disabled]="booking()">
+        @if (booking()) {
+          <i class="fa-solid fa-circle-notch fa-spin"></i> Sending request…
+        } @else {
+          <i class="fa-solid fa-paper-plane"></i> Send Request
+        }
+      </button>
+    </div>
+  </div>
+}

@@ -1,0 +1,261 @@
+<!-- NAV -->
+<nav>
+  <button class="hamburger" (click)="toggleMobileMenu($event)" aria-label="Menu">
+    <i class="fa-solid fa-bars"></i>
+  </button>
+  <div class="nav-logo" routerLink="/find">
+    <div class="logo-mark">ACT</div>
+    Connect Ride
+  </div>
+  <div class="nav-links">
+    <a class="nav-link" routerLink="/find" routerLinkActive="active">
+      <i class="fa-solid fa-magnifying-glass"></i> Find Ride
+    </a>
+    <a class="nav-link" routerLink="/offer" routerLinkActive="active">
+      <i class="fa-solid fa-car"></i> Offer Ride
+    </a>
+    <a class="nav-link" routerLink="/my-rides" routerLinkActive="active">
+      <i class="fa-solid fa-route"></i> My Rides
+    </a>
+    <a class="nav-link" routerLink="/profile" routerLinkActive="active">
+      <i class="fa-solid fa-user"></i> Profile
+    </a>
+  </div>
+  <div class="nav-right">
+    <div class="notif-btn" (click)="toggleNotif($event)">
+      <i class="fa-regular fa-bell"></i>
+      @if (userService.unreadCount() > 0) {
+        <div class="notif-dot"></div>
+      }
+    </div>
+    <div class="theme-toggle-btn" (click)="theme.toggle()" [title]="theme.isDark() ? 'Light Mode' : 'Dark Mode'">
+      @if (theme.isDark()) {
+        <i class="fa-solid fa-sun"></i>
+      } @else {
+        <i class="fa-solid fa-moon"></i>
+      }
+    </div>
+    <div class="avatar" [style.background]="user?.avatarColor" routerLink="/profile">
+      {{ user?.initials }}
+    </div>
+  </div>
+</nav>
+
+<!-- MOBILE MENU DRAWER -->
+@if (mobileMenuOpen()) {
+  <div class="mdrawer-overlay" (click)="closeMobileMenu()">
+    <div class="mdrawer" (click)="$event.stopPropagation()">
+      <div class="mdrawer-head">
+        <div class="nav-logo"><div class="logo-mark">ACT</div> Connect Ride</div>
+        <div class="mdrawer-close" (click)="closeMobileMenu()"><i class="fa-solid fa-xmark"></i></div>
+      </div>
+      <a class="mdrawer-link" routerLink="/find" routerLinkActive="active" (click)="closeMobileMenu()"><i class="fa-solid fa-magnifying-glass"></i> Find a Ride</a>
+      <a class="mdrawer-link" routerLink="/offer" routerLinkActive="active" (click)="closeMobileMenu()"><i class="fa-solid fa-car-side"></i> Offer a Ride</a>
+      <a class="mdrawer-link" routerLink="/my-rides" routerLinkActive="active" (click)="closeMobileMenu()"><i class="fa-solid fa-route"></i> My Rides</a>
+      <a class="mdrawer-link" routerLink="/profile" routerLinkActive="active" (click)="closeMobileMenu()"><i class="fa-solid fa-user"></i> Profile</a>
+      <div class="mdrawer-divider"></div>
+      <div class="mdrawer-link" (click)="closeMobileMenu(); openModal('help')"><i class="fa-regular fa-circle-question"></i> Help &amp; Support</div>
+      <div class="mdrawer-link" (click)="closeMobileMenu(); openModal('settings')"><i class="fa-solid fa-gear"></i> Settings</div>
+      <div class="mdrawer-link" (click)="closeMobileMenu(); openModal('safety')"><i class="fa-solid fa-shield-halved"></i> Safety</div>
+      <div class="mdrawer-link danger" (click)="closeMobileMenu(); logout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</div>
+    </div>
+  </div>
+}
+
+<!-- NOTIFICATION PANEL -->
+@if (notifOpen()) {
+  <div class="notif-panel show" (click)="$event.stopPropagation()">
+    <div class="np-header">
+      <span class="np-title">Notifications</span>
+      <span class="np-mark" (click)="markAllRead()">Mark all read</span>
+    </div>
+    <div class="np-list">
+      @for (n of userService.notifications(); track n._id) {
+        <div class="np-item" [class.unread]="!n.read">
+          <div class="np-dot" [class.read]="n.read"></div>
+          <div>
+            <div class="np-text">{{ n.icon }} <span [innerHTML]="n.text"></span></div>
+            <div class="np-time">{{ n.createdAt | date: 'MMM d, h:mm a' }}</div>
+          </div>
+        </div>
+      } @empty {
+        <div class="np-item"><div class="np-text" style="color:var(--muted)">No notifications yet.</div></div>
+      }
+    </div>
+  </div>
+}
+
+<!-- APP WRAPPER -->
+<div class="app-wrapper">
+  <!-- SIDEBAR (desktop only — nav lives in the top bar) -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">My Stats</div>
+      <div class="stats-mini">
+        <div class="stat-mini-card blue">
+          <div class="stat-mini-val">{{ user?.ridesCount || 0 }}</div>
+          <div class="stat-mini-lbl">Rides</div>
+        </div>
+        <div class="stat-mini-card">
+          <div class="stat-mini-val" style="color:var(--accent4)">{{ user?.rating || 5 }}</div>
+          <div class="stat-mini-lbl">Rating</div>
+        </div>
+        <div class="stat-mini-card green">
+          <div class="stat-mini-val">{{ user?.reviewsCount || 0 }}</div>
+          <div class="stat-mini-lbl">Reviews</div>
+        </div>
+        <div class="stat-mini-card">
+          <div class="stat-mini-val level" style="color:var(--purple)">{{ user?.level || 'New' }}</div>
+          <div class="stat-mini-lbl">Level</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Quick Links</div>
+      <div class="sidebar-item" (click)="openModal('help')">
+        <div class="si-icon"><i class="fa-regular fa-circle-question"></i></div>
+        Help &amp; Support
+      </div>
+      <div class="sidebar-item" (click)="openModal('settings')">
+        <div class="si-icon"><i class="fa-solid fa-gear"></i></div>
+        Settings
+      </div>
+      <div class="sidebar-item" (click)="openModal('safety')">
+        <div class="si-icon"><i class="fa-solid fa-shield-halved"></i></div>
+        Safety
+      </div>
+      <div class="sidebar-item" (click)="logout()">
+        <div class="si-icon"><i class="fa-solid fa-right-from-bracket"></i></div>
+        Logout
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <router-outlet></router-outlet>
+  </main>
+</div>
+
+<!-- ════════ QUICK-LINK MODALS ════════ -->
+@if (modal() !== null) {
+  <div class="ql-overlay" (click)="closeModal()">
+    <div class="ql-modal" (click)="$event.stopPropagation()">
+      <div class="ql-close" (click)="closeModal()"><i class="fa-solid fa-xmark"></i></div>
+
+      <!-- HELP & SUPPORT -->
+      @if (modal() === 'help') {
+        <div class="ql-title"><i class="fa-regular fa-circle-question"></i> Help &amp; Support</div>
+        <div class="ql-sub">Frequently asked questions &amp; ways to reach us</div>
+
+        <div class="faq-list">
+          @for (f of faqs(); track f.q; let i = $index) {
+            <div class="faq" [class.open]="f.open">
+              <div class="faq-q" (click)="toggleFaq(i)">
+                <span>{{ f.q }}</span>
+                <i class="fa-solid" [class.fa-chevron-down]="!f.open" [class.fa-chevron-up]="f.open"></i>
+              </div>
+              @if (f.open) {
+                <div class="faq-a">{{ f.a }}</div>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="contact-grid">
+          <div class="contact-card">
+            <i class="fa-solid fa-envelope"></i>
+            <div><div class="cc-t">Email us</div><div class="cc-s">xxxxx&#64;actcorp.in</div></div>
+          </div>
+          <div class="contact-card">
+            <i class="fa-solid fa-phone"></i>
+            <div><div class="cc-t">Call support</div><div class="cc-s">xxxxx-xxxxx</div></div>
+          </div>
+          <div class="contact-card" (click)="toast.success('Live chat opening…')">
+            <i class="fa-solid fa-comments"></i>
+            <div><div class="cc-t">Live chat</div><div class="cc-s">Avg. reply &lt; 2 min</div></div>
+          </div>
+        </div>
+      }
+
+      <!-- SETTINGS -->
+      @if (modal() === 'settings') {
+        <div class="ql-title"><i class="fa-solid fa-gear"></i> Settings</div>
+        <div class="ql-sub">Manage your account details and security</div>
+
+        <div class="ql-block-title">Appearance</div>
+        <div class="theme-toggle">
+          <button class="theme-opt" [class.active]="!theme.isDark()" (click)="theme.set('light')">
+            <i class="fa-solid fa-sun"></i> Light
+          </button>
+          <button class="theme-opt" [class.active]="theme.isDark()" (click)="theme.set('dark')">
+            <i class="fa-solid fa-moon"></i> Dark
+          </button>
+        </div>
+
+        <div class="ql-divider"></div>
+        <div class="ql-block-title">Account</div>
+        <div class="ql-form">
+          <div class="form-group"><label>Name</label><input class="form-input" [(ngModel)]="sName" /></div>
+          <div class="form-group"><label>Phone Number</label><input class="form-input" type="tel" [(ngModel)]="sPhone" placeholder="+91 98765 43210" /></div>
+          <div class="form-group"><label>City</label><input class="form-input" [(ngModel)]="sCity" /></div>
+          <div class="form-group"><label>Bio</label><textarea class="form-input" rows="2" [(ngModel)]="sBio"></textarea></div>
+          <button class="ql-btn" (click)="saveSettings()"><i class="fa-solid fa-floppy-disk"></i> Save account</button>
+        </div>
+
+        <div class="ql-divider"></div>
+        <div class="ql-block-title">Change Password</div>
+        <div class="ql-form">
+          <div class="form-group"><label>Current password</label><input class="form-input" type="password" [(ngModel)]="curPassword" placeholder="••••••••" /></div>
+          <div class="form-group"><label>New password (min 6 chars)</label><input class="form-input" type="password" [(ngModel)]="newPassword" placeholder="••••••••" /></div>
+          <button class="ql-btn" (click)="changePassword()" [disabled]="changingPw()">
+            @if (changingPw()) { <i class="fa-solid fa-circle-notch fa-spin"></i> Updating… }
+            @else { <i class="fa-solid fa-key"></i> Update password }
+          </button>
+        </div>
+
+        <div class="ql-divider"></div>
+        <div class="ql-block-title">Preferences</div>
+        <div class="ql-toggle-row" (click)="togglePref('twoFactorAuth', !user?.preferences?.twoFactorAuth, '2FA updated')">
+          <div><i class="fa-solid fa-lock"></i> Two-Factor Authentication</div>
+          <div class="toggle-sw" [class.on]="user?.preferences?.twoFactorAuth"></div>
+        </div>
+        <div class="ql-toggle-row" (click)="togglePref('shareTripLive', !user?.preferences?.shareTripLive, 'Share-trip updated')">
+          <div><i class="fa-solid fa-share-nodes"></i> Share Trip Live by default</div>
+          <div class="toggle-sw" [class.on]="user?.preferences?.shareTripLive"></div>
+        </div>
+      }
+
+      <!-- SAFETY -->
+      @if (modal() === 'safety') {
+        <div class="ql-title"><i class="fa-solid fa-shield-halved"></i> Safety Center</div>
+        <div class="ql-sub">Your safety tools — always one tap away</div>
+
+        <button class="sos-btn" [class.active]="sosActive()" (click)="triggerSos()">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          {{ sosActive() ? 'SOS ACTIVE — help is on the way' : 'Trigger SOS Emergency' }}
+        </button>
+        <div class="sos-note">Sends your live location to your emergency contact &amp; ACT ConnectRide Safety.</div>
+
+        <div class="ql-divider"></div>
+        <div class="ql-block-title">Emergency Contact</div>
+        <div class="ql-form">
+          <div class="form-group">
+            <label>Name &amp; phone</label>
+            <input class="form-input" [(ngModel)]="emergencyContact" placeholder="e.g. Mom · +91 98765 43210" />
+          </div>
+          <button class="ql-btn" (click)="saveEmergency()"><i class="fa-solid fa-phone"></i> Save contact</button>
+        </div>
+
+        <div class="ql-divider"></div>
+        <div class="ql-block-title">Live Trip Sharing</div>
+        <div class="ql-toggle-row" (click)="togglePref('shareTripLive', !user?.preferences?.shareTripLive, 'Share-trip updated')">
+          <div><i class="fa-solid fa-share-nodes"></i> Share trip live with contact</div>
+          <div class="toggle-sw" [class.on]="user?.preferences?.shareTripLive"></div>
+        </div>
+        <button class="ql-btn outline" (click)="shareTrip()"><i class="fa-solid fa-link"></i> Copy live trip link</button>
+      }
+    </div>
+  </div>
+}

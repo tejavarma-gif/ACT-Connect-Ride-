@@ -1,0 +1,145 @@
+<div class="page fade-in">
+  <div class="section-header" style="margin-bottom: 24px">
+    <div>
+      <div class="section-title">Offer a Ride</div>
+      <div class="section-sub">Share your journey with fellow ACT commuters</div>
+    </div>
+  </div>
+
+  <div class="offer-layout">
+    <div>
+      <div class="form-card">
+        <h3>Vehicle Type</h3>
+        <p class="sub">What are you offering?</p>
+        <div class="vehicle-selector">
+          <div class="vehicle-opt car" [class.active]="vehicle() === 'car'" (click)="selectVehicle('car')">
+            <div class="vehicle-emoji">🚗</div>
+            <div class="vehicle-name">Car Pool</div>
+            <div class="vehicle-sub">Up to 4 passengers</div>
+          </div>
+          <div class="vehicle-opt bike" [class.active]="vehicle() === 'bike'" (click)="selectVehicle('bike')">
+            <div class="vehicle-emoji">🏍️</div>
+            <div class="vehicle-name">Bike Pool</div>
+            <div class="vehicle-sub">1 passenger (pillion)</div>
+          </div>
+        </div>
+
+        <div class="form-divider"></div>
+        <h3>Route Details</h3>
+        <p class="sub">Where are you going?</p>
+        <div class="form-row">
+          <div class="form-group">
+            <label>From</label>
+            <div class="input-icon-wrap">
+              <i class="fi fa-solid fa-circle-dot" style="color: var(--accent)"></i>
+              <input class="form-input" [(ngModel)]="from" placeholder="Your starting point" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>To</label>
+            <div class="input-icon-wrap">
+              <i class="fi fa-solid fa-location-dot" style="color: var(--accent3)"></i>
+              <input class="form-input" [(ngModel)]="to" placeholder="Destination" />
+            </div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Date</label>
+            <input class="form-input" type="date" [(ngModel)]="date" />
+          </div>
+          <div class="form-group">
+            <label>Departure Time</label>
+            <input class="form-input" type="time" [(ngModel)]="time" />
+          </div>
+        </div>
+
+        <div class="form-divider"></div>
+        <h3>Seats</h3>
+        <p class="sub">How many seats can you share?</p>
+        <div class="form-group" style="max-width: 240px">
+          <label>Available Seats</label>
+          <div class="input-icon-wrap">
+            <i class="fi fa-solid fa-user-group"></i>
+            <select class="form-input" [(ngModel)]="seats" [disabled]="vehicle() === 'bike'">
+              @if (vehicle() === 'bike') {
+                <option [ngValue]="1">1 seat</option>
+              } @else {
+                <option [ngValue]="1">1 seat</option>
+                <option [ngValue]="2">2 seats</option>
+                <option [ngValue]="3">3 seats</option>
+                <option [ngValue]="4">4 seats</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <div class="form-divider"></div>
+        <h3 style="margin-bottom: 14px">Ride Rules</h3>
+        <div class="rules-grid">
+          @for (rule of rules(); track rule.key) {
+            <div class="rule-toggle" [class.on]="rule.on" (click)="toggleRule(rule.key)">
+              <div class="rule-label"><i class="fa-solid {{ rule.icon }}" style="color: var(--muted)"></i> {{ rule.label }}</div>
+              <div class="toggle-sw" [class.on]="rule.on"></div>
+            </div>
+          }
+        </div>
+
+        <button class="submit-btn" (click)="submit()" [disabled]="submitting()">
+          @if (submitting()) {
+            <i class="fa-solid fa-circle-notch fa-spin"></i> Publishing…
+          } @else {
+            <i class="fa-solid fa-paper-plane"></i> Publish Ride
+          }
+        </button>
+      </div>
+    </div>
+
+    <!-- PREVIEW -->
+    <div>
+      <div class="preview-card">
+        <div class="preview-title"><i class="fa-solid fa-eye"></i> &nbsp;Listing Preview</div>
+        <div class="preview-vehicle">{{ vehicle() === 'bike' ? '🏍️ Bike Pool' : '🚗 Car Pool' }}</div>
+        <div class="preview-details">
+          <div class="preview-row">
+            <span class="label"><i class="fa-solid fa-circle-dot" style="color: var(--accent); margin-right: 4px"></i> From</span>
+            <span class="value">{{ from || '—' }}</span>
+          </div>
+          <div class="preview-row">
+            <span class="label"><i class="fa-solid fa-location-dot" style="color: var(--accent3); margin-right: 4px"></i> To</span>
+            <span class="value">{{ to || '—' }}</span>
+          </div>
+          <div class="preview-row">
+            <span class="label"><i class="fa-regular fa-calendar" style="margin-right: 4px"></i> Date</span>
+            <span class="value">{{ formatDate(date) }}</span>
+          </div>
+          <div class="preview-row">
+            <span class="label"><i class="fa-regular fa-clock" style="margin-right: 4px"></i> Time</span>
+            <span class="value">{{ time || '—' }}</span>
+          </div>
+          <div class="preview-row">
+            <span class="label"><i class="fa-solid fa-user-group" style="margin-right: 4px"></i> Seats</span>
+            <span class="value">{{ seats }}</span>
+          </div>
+        </div>
+
+        <div class="preview-rules">
+          <div class="pr-title">Rules</div>
+          <div class="pr-chips">
+            @for (rule of rules(); track rule.key) {
+              @if (rule.on) {
+                <span class="pr-chip"><i class="fa-solid {{ rule.icon }}"></i> {{ rule.label }}</span>
+              }
+            }
+          </div>
+        </div>
+
+        <div class="info-note">
+          <i class="fa-solid fa-circle-info"></i>
+          Once published, your ride is visible to other ACT commuters in Find Ride. You'll
+          approve each request from My Rides → As Driver.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
