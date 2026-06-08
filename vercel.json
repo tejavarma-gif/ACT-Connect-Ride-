@@ -1,9 +1,12 @@
 {
-  "version": 3,
+  "version": 2,
   "builds": [
     {
       "src": "package.json",
-      "use": "@vercel/static-build"
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist/poolgo"
+      }
     }
   ],
   "routes": [
@@ -14,6 +17,5 @@
       "src": "/.*",
       "dest": "/index.html"
     }
-  ],
-  "outputDirectory": "dist/poolgo"
+  ]
 }
