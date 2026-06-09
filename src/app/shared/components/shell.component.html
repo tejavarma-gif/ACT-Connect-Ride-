@@ -5,7 +5,7 @@
   </button>
   <div class="nav-logo" routerLink="/find">
     <div class="logo-mark">ACT</div>
-    Connect Ride
+    <span>Connect<span class="nav-space"> </span>Ride</span>
   </div>
   <div class="nav-links">
     <a class="nav-link" routerLink="/find" routerLinkActive="active">
@@ -46,7 +46,7 @@
   <div class="mdrawer-overlay" (click)="closeMobileMenu()">
     <div class="mdrawer" (click)="$event.stopPropagation()">
       <div class="mdrawer-head">
-        <div class="nav-logo"><div class="logo-mark">ACT</div> Connect Ride</div>
+        <div class="nav-logo"><div class="logo-mark">ACT</div><span>Connect<span class="nav-space"> </span>Ride</span></div>
         <div class="mdrawer-close" (click)="closeMobileMenu()"><i class="fa-solid fa-xmark"></i></div>
       </div>
       <a class="mdrawer-link" routerLink="/find" routerLinkActive="active" (click)="closeMobileMenu()"><i class="fa-solid fa-magnifying-glass"></i> Find a Ride</a>
