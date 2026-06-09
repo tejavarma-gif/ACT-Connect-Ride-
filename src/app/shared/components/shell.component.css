@@ -195,16 +195,18 @@ nav {
   .sidebar { width: 220px; }
 }
 @media (max-width: 700px) {
-  /* mobile: hamburger left, logo centered, actions right */
+  /* mobile: hamburger left, logo centered (shifted left), actions right */
   .sidebar { display: none; }
   .nav-links { display: none; }
   .hamburger { display: flex; }
   nav { padding: 0 14px; position: relative; }
   .nav-logo {
     position: absolute;
-    left: 50%;
+    left: 40%;
     transform: translateX(-50%);
+    font-size: 15px;
   }
+  .nav-space { display: none; }
   .notif-panel { right: 10px; left: 10px; width: auto; }
 }
 
